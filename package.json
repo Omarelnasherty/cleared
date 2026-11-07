@@ -1,0 +1,50 @@
+{
+  "name": "cleared",
+  "version": "0.0.0",
+  "description": "Get your app through Meta App Review: data deletion callbacks, a pre-submission doctor and a playbook for every permission.",
+  "keywords": [
+    "meta",
+    "facebook",
+    "instagram",
+    "whatsapp",
+    "messenger",
+    "app-review",
+    "data-deletion",
+    "graph-api"
+  ],
+  "homepage": "https://github.com/Omarelnasherty/cleared#readme",
+  "bugs": "https://github.com/Omarelnasherty/cleared/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Omarelnasherty/cleared.git"
+  },
+  "license": "MIT",
+  "author": "Omar El-nasherty <contact@omarelnasherty.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
