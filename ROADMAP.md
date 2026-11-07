@@ -5,7 +5,7 @@ One small step at a time. Checked items are done.
 ## 0.1 Callbacks
 
 - [x] Workspace setup: TypeScript package, Biome, Vitest, CI on Node 20, 22 and 24, README, brand assets
-- [ ] `parseSignedRequest`: verify the HMAC-SHA256 signature with the app secret, decode the base64url payload, reject bad algorithms and expired requests
+- [x] `parseSignedRequest`: verify the HMAC-SHA256 signature with the app secret, decode the base64url payload, reject bad algorithms and expired requests
 - [ ] Data deletion handler on the Web `Request`/`Response` API: returns `{ url, confirmation_code }`, calls an `onDelete` hook, pluggable status store with an in-memory default
 - [ ] Deletion status page: plain HTML, English and Arabic, no scripts, shows the confirmation code and state
 - [ ] Deauthorize handler with an `onDeauthorize` hook
