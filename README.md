@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** early development. Follow the [roadmap](ROADMAP.md) for what works today.
+> **Status:** early development. Signed request parsing and the data deletion handler work today. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -22,6 +22,22 @@ npm install cleared
 ```
 
 Requires Node.js 20 or later.
+
+## Data deletion callback
+
+```ts
+import { createDataDeletionHandler } from 'cleared';
+
+export const handleDeletion = createDataDeletionHandler({
+  appSecret: process.env.META_APP_SECRET!,
+  statusUrl: 'https://example.com/deletion-status',
+  onDelete: async ({ userId }) => {
+    await deleteUserData(userId);
+  },
+});
+```
+
+The handler takes a Web `Request` and returns a `Response` with `url` and `confirmation_code`. The status page and the Express and Next.js adapters are on the [roadmap](ROADMAP.md).
 
 ## Still stuck?
 
