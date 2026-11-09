@@ -16,3 +16,7 @@ export {
   SignedRequestError,
   type SignedRequestPayload,
 } from './signed-request.js';
+export {
+  createDeletionStatusHandler,
+  type StatusPageOptions,
+} from './status-page.js';

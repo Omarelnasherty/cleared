@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** early development. Signed request parsing and the data deletion handler work today. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** early development. Signed request parsing, the data deletion handler and its status page work today. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -37,7 +37,24 @@ export const handleDeletion = createDataDeletionHandler({
 });
 ```
 
-The handler takes a Web `Request` and returns a `Response` with `url` and `confirmation_code`. The status page and the Express and Next.js adapters are on the [roadmap](ROADMAP.md).
+The handler takes a Web `Request` and returns a `Response` with `url` and `confirmation_code`.
+
+Serve the status page at the `statusUrl`, with the same store:
+
+```ts
+import {
+  createDataDeletionHandler,
+  createDeletionStatusHandler,
+  createMemoryStatusStore,
+} from 'cleared';
+
+const store = createMemoryStatusStore();
+
+export const handleDeletion = createDataDeletionHandler({ /* ... */ store });
+export const handleStatus = createDeletionStatusHandler({ store, appName: 'Example App' });
+```
+
+The page is plain HTML without scripts. It shows the confirmation code and the state, in English or Arabic (`?lang=ar`, or the browser language). The Express and Next.js adapters are on the [roadmap](ROADMAP.md).
 
 ## Still stuck?
 

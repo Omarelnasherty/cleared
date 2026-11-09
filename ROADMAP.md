@@ -7,7 +7,7 @@ One small step at a time. Checked items are done.
 - [x] Workspace setup: TypeScript package, Biome, Vitest, CI on Node 20, 22 and 24, README, brand assets
 - [x] `parseSignedRequest`: verify the HMAC-SHA256 signature with the app secret, decode the base64url payload, reject bad algorithms and expired requests
 - [x] Data deletion handler on the Web `Request`/`Response` API: returns `{ url, confirmation_code }`, calls an `onDelete` hook, pluggable status store with an in-memory default
-- [ ] Deletion status page: plain HTML, English and Arabic, no scripts, shows the confirmation code and state
+- [x] Deletion status page: plain HTML, English and Arabic, no scripts, shows the confirmation code and state
 - [ ] Deauthorize handler with an `onDeauthorize` hook
 - [ ] Express adapter (`cleared/express`)
 - [ ] Next.js route handler adapter (`cleared/next`), plus a note on Hono, Bun and Workers using the Web handlers directly
