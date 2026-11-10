@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** early development. Signed request parsing, the data deletion handler and its status page work today. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** early development. Signed request parsing, the data deletion and deauthorize handlers and the status page work today. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -55,6 +55,21 @@ export const handleStatus = createDeletionStatusHandler({ store, appName: 'Examp
 ```
 
 The page is plain HTML without scripts. It shows the confirmation code and the state, in English or Arabic (`?lang=ar`, or the browser language). The Express and Next.js adapters are on the [roadmap](ROADMAP.md).
+
+## Deauthorize callback
+
+```ts
+import { createDeauthorizeHandler } from 'cleared';
+
+export const handleDeauthorize = createDeauthorizeHandler({
+  appSecret: process.env.META_APP_SECRET!,
+  onDeauthorize: async ({ userId }) => {
+    await revokeSessions(userId);
+  },
+});
+```
+
+It verifies the signed request, calls `onDeauthorize` and answers 200.
 
 ## Still stuck?
 

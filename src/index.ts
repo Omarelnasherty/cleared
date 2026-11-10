@@ -2,6 +2,11 @@
 export const version = '0.0.0';
 
 export {
+  createDeauthorizeHandler,
+  type DeauthorizeOptions,
+  type DeauthorizeRequest,
+} from './deauthorize.js';
+export {
   createDataDeletionHandler,
   createMemoryStatusStore,
   type DataDeletionOptions,
