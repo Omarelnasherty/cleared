@@ -35,6 +35,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "default": "./dist/express.js"
     }
   },
   "files": [
@@ -42,6 +46,14 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "peerDependencies": {
+    "express": ">=4.17"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -53,7 +65,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
+    "@types/express": "^5.0.6",
     "@types/node": "^20.19.43",
+    "express": "^5.3.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   }

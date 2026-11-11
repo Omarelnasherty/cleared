@@ -9,7 +9,7 @@ One small step at a time. Checked items are done.
 - [x] Data deletion handler on the Web `Request`/`Response` API: returns `{ url, confirmation_code }`, calls an `onDelete` hook, pluggable status store with an in-memory default
 - [x] Deletion status page: plain HTML, English and Arabic, no scripts, shows the confirmation code and state
 - [x] Deauthorize handler with an `onDeauthorize` hook
-- [ ] Express adapter (`cleared/express`)
+- [x] Express adapter (`cleared/express`)
 - [ ] Next.js route handler adapter (`cleared/next`), plus a note on Hono, Bun and Workers using the Web handlers directly
 - [ ] Example app and `docs/callbacks.md`
 - [ ] Rejection pages for callbacks: `docs/rejections/`, one page per message Meta sends about data deletion and deauthorize URLs, titled with that exact message and followed by the fix. Use only wording found in Meta's docs or public developer reports, never invented

@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** early development. Signed request parsing, the data deletion and deauthorize handlers and the status page work today. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** early development. Signed request parsing, the data deletion and deauthorize handlers, the status page and the Express adapter work today. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -54,7 +54,7 @@ export const handleDeletion = createDataDeletionHandler({ /* ... */ store });
 export const handleStatus = createDeletionStatusHandler({ store, appName: 'Example App' });
 ```
 
-The page is plain HTML without scripts. It shows the confirmation code and the state, in English or Arabic (`?lang=ar`, or the browser language). The Express and Next.js adapters are on the [roadmap](ROADMAP.md).
+The page is plain HTML without scripts. It shows the confirmation code and the state, in English or Arabic (`?lang=ar`, or the browser language). The Next.js adapter is on the [roadmap](ROADMAP.md).
 
 ## Deauthorize callback
 
@@ -70,6 +70,38 @@ export const handleDeauthorize = createDeauthorizeHandler({
 ```
 
 It verifies the signed request, calls `onDeauthorize` and answers 200.
+
+## Express
+
+```ts
+import express from 'express';
+import { createMemoryStatusStore } from 'cleared';
+import { dataDeletion, deauthorize, deletionStatus } from 'cleared/express';
+
+const app = express();
+const store = createMemoryStatusStore();
+const appSecret = process.env.META_APP_SECRET!;
+
+app.post(
+  '/meta/deletion',
+  dataDeletion({
+    appSecret,
+    statusUrl: 'https://example.com/meta/deletion-status',
+    store,
+    onDelete: ({ userId }) => deleteUserData(userId),
+  }),
+);
+app.get('/meta/deletion-status', deletionStatus({ store, appName: 'Example App' }));
+app.post(
+  '/meta/deauthorize',
+  deauthorize({
+    appSecret,
+    onDeauthorize: ({ userId }) => revokeSessions(userId),
+  }),
+);
+```
+
+The middleware works with or without `express.urlencoded()` in front of it, on Express 4 and 5. Errors from your hooks go to `next`. To mount any other Web handler, wrap it with `toExpress(handler)`.
 
 ## Still stuck?
 
