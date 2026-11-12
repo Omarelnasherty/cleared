@@ -7,3 +7,4 @@
 - Add `createDeletionStatusHandler`, a plain HTML status page in English and Arabic.
 - Add `createDeauthorizeHandler` for the deauthorize callback.
 - Add the Express adapter, `cleared/express`, with `express` as an optional peer dependency.
+- Add the Next.js adapter, `cleared/next`, for App Router route handlers.

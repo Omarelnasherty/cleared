@@ -39,6 +39,10 @@
     "./express": {
       "types": "./dist/express.d.ts",
       "default": "./dist/express.js"
+    },
+    "./next": {
+      "types": "./dist/next.d.ts",
+      "default": "./dist/next.js"
     }
   },
   "files": [
