@@ -8,3 +8,4 @@
 - Add `createDeauthorizeHandler` for the deauthorize callback.
 - Add the Express adapter, `cleared/express`, with `express` as an optional peer dependency.
 - Add the Next.js adapter, `cleared/next`, for App Router route handlers.
+- Add an Express example app and `docs/callbacks.md`, a guide to setting up and testing the callbacks.

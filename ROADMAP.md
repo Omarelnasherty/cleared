@@ -11,7 +11,7 @@ One small step at a time. Checked items are done.
 - [x] Deauthorize handler with an `onDeauthorize` hook
 - [x] Express adapter (`cleared/express`)
 - [x] Next.js route handler adapter (`cleared/next`), plus a note on Hono, Bun and Workers using the Web handlers directly
-- [ ] Example app and `docs/callbacks.md`
+- [x] Example app and `docs/callbacks.md`
 - [ ] Rejection pages for callbacks: `docs/rejections/`, one page per message Meta sends about data deletion and deauthorize URLs, titled with that exact message and followed by the fix. Use only wording found in Meta's docs or public developer reports, never invented
 - [ ] Prepare 0.1.0
 

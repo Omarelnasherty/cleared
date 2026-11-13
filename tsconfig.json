@@ -10,6 +10,8 @@
     "exactOptionalPropertyTypes": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
+    "rootDir": ".",
+    "allowJs": true,
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": true,

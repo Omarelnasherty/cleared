@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** early development. Signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters work today. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** early development. Signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters work today, with an [example app](examples/express) and a [callbacks guide](docs/callbacks.md). Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -177,6 +177,10 @@ export default {
 ```
 
 That object works as is with `bun run` and `deno serve`. On Workers, turn on the `nodejs_compat` compatibility flag for `node:crypto`, and keep statuses in KV or D1 instead of memory.
+
+## Callbacks guide
+
+[docs/callbacks.md](docs/callbacks.md) covers where the URLs go in the App Dashboard, what to change before going live, and how to test with a signed request. [examples/express](examples/express) is a working app you can run locally.
 
 ## Still stuck?
 
