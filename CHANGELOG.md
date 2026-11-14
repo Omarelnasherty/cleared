@@ -9,3 +9,4 @@
 - Add the Express adapter, `cleared/express`, with `express` as an optional peer dependency.
 - Add the Next.js adapter, `cleared/next`, for App Router route handlers.
 - Add an Express example app and `docs/callbacks.md`, a guide to setting up and testing the callbacks.
+- Add `docs/rejections/`, pages for the messages Meta sends about the data deletion callback, each with the fix.

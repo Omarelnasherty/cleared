@@ -12,7 +12,8 @@ One small step at a time. Checked items are done.
 - [x] Express adapter (`cleared/express`)
 - [x] Next.js route handler adapter (`cleared/next`), plus a note on Hono, Bun and Workers using the Web handlers directly
 - [x] Example app and `docs/callbacks.md`
-- [ ] Rejection pages for callbacks: `docs/rejections/`, one page per message Meta sends about data deletion and deauthorize URLs, titled with that exact message and followed by the fix. Use only wording found in Meta's docs or public developer reports, never invented
+- [x] Rejection pages for callbacks: `docs/rejections/`, one page per message Meta sends about data deletion and deauthorize URLs, titled with that exact message and followed by the fix. Use only wording found in Meta's docs or public developer reports, never invented
+- [ ] More callback rejection pages: the App Dashboard errors when saving the data deletion URL, and App Review notes about data deletion, once their exact wording is confirmed from Meta's docs or public developer reports
 - [ ] Prepare 0.1.0
 
 ## 0.2 Doctor

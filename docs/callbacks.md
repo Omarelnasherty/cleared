@@ -63,6 +63,10 @@ META_APP_SECRET=... node examples/express/send-test-request.js https://example.c
 
 You should get a 200 with `url` and `confirmation_code`, and the `url` should open the status page with the state "Completed". A 400 with `Signature does not match` means the server is using a different secret than the one you signed with.
 
+## When Meta reports a problem
+
+If a user sees "Unable to confirm request was received" or you get a "User Data Deletion Request" email, the [rejection pages](rejections/README.md) explain what each message means and how to fix it.
+
 ## Status page
 
 The page is plain HTML with no scripts or external assets. It shows the confirmation code and the state in English or Arabic. The language comes from `?lang=en` or `?lang=ar`, then the browser's `Accept-Language`. It answers 400 when the code is missing and 404 when the code is unknown, and asks search engines not to index it.
