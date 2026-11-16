@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` runs, but only checks the environment so far; the Graph API, URL, webhook and callback checks come next. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -177,6 +177,18 @@ export default {
 ```
 
 That object works as is with `bun run` and `deno serve`. On Workers, turn on the `nodejs_compat` compatibility flag for `node:crypto`, and keep statuses in KV or D1 instead of memory.
+
+## Doctor
+
+```
+export META_APP_ID=1234567890
+export META_APP_SECRET=...
+npx cleared doctor
+```
+
+It prints a report with a green check for what passed, an amber `!` for what you need to check by hand and a red cross for what blocks your submission. It exits with 1 when something is blocking, so you can run it in CI. Add `--json` for a machine-readable report.
+
+The secret is only read from the environment. The doctor never prints it or writes it anywhere.
 
 ## Callbacks guide
 

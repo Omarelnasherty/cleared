@@ -45,6 +45,9 @@
       "default": "./dist/next.js"
     }
   },
+  "bin": {
+    "cleared": "./dist/bin.js"
+  },
   "files": [
     "dist"
   ],

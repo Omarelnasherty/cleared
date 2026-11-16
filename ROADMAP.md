@@ -17,7 +17,7 @@ One small step at a time. Checked items are done.
 
 ## 0.2 Doctor
 
-- [ ] `cleared doctor` CLI skeleton: reads `META_APP_ID` and `META_APP_SECRET` from the environment, never prints or stores the secret, text and JSON output, exit code 1 on blocking issues
+- [x] `cleared doctor` CLI skeleton: reads `META_APP_ID` and `META_APP_SECRET` from the environment, never prints or stores the secret, text and JSON output, exit code 1 on blocking issues
 - [ ] App settings checks through the Graph API: privacy policy, terms, app icon, category, app domains, deauthorize callback
 - [ ] URL checks: HTTPS, loads without a login wall, no redirect to a sign-in page, privacy policy mentions how to request data deletion
 - [ ] Webhook checks: read `/{app-id}/subscriptions`, flag inactive ones, test the verify token handshake against the callback URL

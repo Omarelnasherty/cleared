@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add the `cleared doctor` command. It checks that `META_APP_ID` and `META_APP_SECRET` are set, prints a text or JSON report and exits with 1 on blocking issues.
+
 ## 0.1.0 (2026-11-15)
 
 - Add `parseSignedRequest` to verify and decode signed requests.
