@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, test } from 'vitest';
 import { type CliIo, main } from '../src/cli.js';
 import { version } from '../src/index.js';
+import { fakeGraph } from './fake-graph.js';
 
 const secret = 'test-secret-0123456789abcdef';
 
@@ -11,6 +12,7 @@ async function run(argv: string[], env: CliIo['env'] = {}, isTTY = false) {
   const code = await main(argv, {
     env,
     isTTY,
+    fetch: fakeGraph().fetch,
     stdout: (text) => {
       stdout += text;
     },

@@ -1,20 +1,61 @@
 import { describe, expect, test } from 'vitest';
-import { formatReport, runDoctor } from '../src/doctor.js';
+import { checkAppSettings, formatReport, runDoctor } from '../src/doctor.js';
+import { GRAPH_API_VERSION } from '../src/graph.js';
 import { version } from '../src/index.js';
+import { completeApp, fakeGraph } from './fake-graph.js';
 
 const secret = 'test-secret-0123456789abcdef';
 const env = { META_APP_ID: '1234567890', META_APP_SECRET: secret };
 
 describe('runDoctor', () => {
-  test('passes when the app ID and secret are set', async () => {
-    const report = await runDoctor({ env });
+  test('passes a complete app', async () => {
+    const graph = fakeGraph();
+    const report = await runDoctor({ env, fetch: graph.fetch });
     expect(report.version).toBe(version);
     expect(report.appId).toBe('1234567890');
-    expect(report.summary).toEqual({ pass: 2, manual: 0, blocking: 0 });
+    expect(report.summary).toEqual({ pass: 9, manual: 0, blocking: 0 });
+    expect(report.findings[2]?.title).toBe('Read the app settings (Example App)');
   });
 
-  test('blocks when the variables are missing', async () => {
-    const report = await runDoctor({ env: {} });
+  test('reads the app with an app access token on the pinned version', async () => {
+    const graph = fakeGraph();
+    await runDoctor({ env, fetch: graph.fetch });
+    const [url] = graph.urls;
+    expect(url?.origin).toBe('https://graph.facebook.com');
+    expect(url?.pathname).toBe(`/${GRAPH_API_VERSION}/1234567890`);
+    expect(url?.searchParams.get('access_token')).toBe(`1234567890|${secret}`);
+    expect(url?.searchParams.get('fields')?.split(',')).toContain('privacy_policy_url');
+  });
+
+  test('blocks when the Graph API rejects the credentials', async () => {
+    const graph = fakeGraph(
+      { error: { message: 'Error validating client secret.', type: 'OAuthException', code: 1 } },
+      400,
+    );
+    const report = await runDoctor({ env, fetch: graph.fetch });
+    expect(report.findings.map((f) => [f.id, f.status])).toEqual([
+      ['env.app-id', 'pass'],
+      ['env.app-secret', 'pass'],
+      ['graph.app', 'blocking'],
+    ]);
+    expect(report.findings[2]?.detail).toBe(
+      'Error validating client secret. Check that META_APP_ID and META_APP_SECRET belong to the same app.',
+    );
+  });
+
+  test('blocks when the Graph API cannot be reached, without leaking the secret', async () => {
+    const fetch = async () => {
+      throw new Error(`connect failed for access_token=1234567890|${secret}`);
+    };
+    const report = await runDoctor({ env, fetch });
+    expect(report.findings[2]?.status).toBe('blocking');
+    expect(JSON.stringify(report)).not.toContain(secret);
+  });
+
+  test('does not call the Graph API when the environment is incomplete', async () => {
+    const graph = fakeGraph();
+    const report = await runDoctor({ env: {}, fetch: graph.fetch });
+    expect(graph.urls).toHaveLength(0);
     expect(report.appId).toBeNull();
     expect(report.findings.map((f) => [f.id, f.status])).toEqual([
       ['env.app-id', 'blocking'],
@@ -23,7 +64,10 @@ describe('runDoctor', () => {
   });
 
   test('blocks an app ID that is not numeric', async () => {
-    const report = await runDoctor({ env: { ...env, META_APP_ID: 'my-app' } });
+    const report = await runDoctor({
+      env: { ...env, META_APP_ID: 'my-app' },
+      fetch: fakeGraph().fetch,
+    });
     expect(report.findings[0]).toMatchObject({
       status: 'blocking',
       title: expect.stringMatching(/valid/),
@@ -37,10 +81,39 @@ describe('runDoctor', () => {
 
   test('never puts the secret in the report', async () => {
     for (const value of [secret, ` ${secret} `]) {
-      const report = await runDoctor({ env: { ...env, META_APP_SECRET: value } });
+      const report = await runDoctor({
+        env: { ...env, META_APP_SECRET: value },
+        fetch: fakeGraph().fetch,
+      });
       expect(JSON.stringify(report)).not.toContain(secret);
       expect(formatReport(report)).not.toContain(secret);
     }
+  });
+});
+
+describe('checkAppSettings', () => {
+  const statuses = (app: typeof completeApp) =>
+    Object.fromEntries(checkAppSettings(app).map((f) => [f.id, f.status]));
+
+  test('passes a complete app', () => {
+    expect(new Set(Object.values(statuses(completeApp)))).toEqual(new Set(['pass']));
+  });
+
+  test('blocks on a missing privacy policy, icon and category', () => {
+    expect(statuses({ name: 'Empty' })).toEqual({
+      'app.privacy-policy': 'blocking',
+      'app.terms': 'manual',
+      'app.icon': 'blocking',
+      'app.category': 'blocking',
+      'app.domains': 'manual',
+      'app.deauthorize': 'manual',
+    });
+  });
+
+  test('treats blank values as missing', () => {
+    const result = statuses({ ...completeApp, privacy_policy_url: ' ', app_domains: [''] });
+    expect(result['app.privacy-policy']).toBe('blocking');
+    expect(result['app.domains']).toBe('manual');
   });
 });
 
@@ -64,7 +137,7 @@ describe('formatReport', () => {
   });
 
   test('has no contact line without blocking issues', async () => {
-    const text = formatReport(await runDoctor({ env }));
+    const text = formatReport(await runDoctor({ env, fetch: fakeGraph().fetch }));
     expect(text).not.toContain('contact@');
     expect(text).not.toContain('\x1b[');
   });

@@ -8,6 +8,8 @@ export interface CliIo {
   stderr: (text: string) => void;
   /** Whether stdout is a terminal, to decide on colors. */
   isTTY: boolean;
+  /** The fetch used for Graph API calls. Default the global fetch. */
+  fetch?: typeof globalThis.fetch;
 }
 
 const USAGE = `Usage: cleared <command> [options]
@@ -20,7 +22,8 @@ Options:
   -h, --help     Show this help
   -v, --version  Show the version
 
-The doctor reads META_APP_ID and META_APP_SECRET from the environment.
+The doctor reads META_APP_ID and META_APP_SECRET from the environment
+and reads your app settings through the Graph API.
 `;
 
 function useColor(io: CliIo): boolean {
@@ -54,7 +57,7 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
     return 2;
   }
 
-  const report = await runDoctor({ env: io.env });
+  const report = await runDoctor({ env: io.env, ...(io.fetch && { fetch: io.fetch }) });
   io.stdout(
     values.json
       ? `${JSON.stringify(report, null, 2)}\n`

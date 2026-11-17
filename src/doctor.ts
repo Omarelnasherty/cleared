@@ -1,3 +1,4 @@
+import { type AppSettings, type Fetch, fetchAppSettings, GraphError } from './graph.js';
 import { version } from './index.js';
 
 /** pass: nothing to do. manual: check it yourself. blocking: fix it before you submit. */
@@ -23,6 +24,8 @@ export interface Report {
 export interface DoctorOptions {
   /** Where to read META_APP_ID and META_APP_SECRET. Default process.env. */
   env?: Record<string, string | undefined>;
+  /** The fetch used for Graph API calls. Default the global fetch. */
+  fetch?: Fetch;
 }
 
 const DASHBOARD_HINT = 'Copy it from App settings > Basic in the App Dashboard.';
@@ -69,6 +72,112 @@ function checkAppSecret(appSecret: string | undefined): Finding {
   return { id, status: 'pass', title: 'META_APP_SECRET is set' };
 }
 
+const BASIC_SETTINGS = 'Set it in App settings > Basic in the App Dashboard.';
+
+function present(value: string | undefined): value is string {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+/** Checks the app settings that App Review looks at, as read from the Graph API. */
+export function checkAppSettings(app: AppSettings): Finding[] {
+  const findings: Finding[] = [];
+
+  findings.push(
+    present(app.privacy_policy_url)
+      ? { id: 'app.privacy-policy', status: 'pass', title: 'Privacy policy URL is set' }
+      : {
+          id: 'app.privacy-policy',
+          status: 'blocking',
+          title: 'Privacy policy URL is missing',
+          detail: `Apps need a public privacy policy to go live and to pass review. ${BASIC_SETTINGS}`,
+        },
+  );
+
+  findings.push(
+    present(app.terms_of_service_url)
+      ? { id: 'app.terms', status: 'pass', title: 'Terms of service URL is set' }
+      : {
+          id: 'app.terms',
+          status: 'manual',
+          title: 'Terms of service URL is missing',
+          detail: `Check whether your app needs one before it can go live. ${BASIC_SETTINGS}`,
+        },
+  );
+
+  findings.push(
+    present(app.icon_url)
+      ? { id: 'app.icon', status: 'pass', title: 'App icon is set' }
+      : {
+          id: 'app.icon',
+          status: 'blocking',
+          title: 'App icon is missing',
+          detail: `Upload a 1024 x 1024 icon. ${BASIC_SETTINGS}`,
+        },
+  );
+
+  findings.push(
+    present(app.category)
+      ? { id: 'app.category', status: 'pass', title: `Category is set (${app.category})` }
+      : {
+          id: 'app.category',
+          status: 'blocking',
+          title: 'Category is missing',
+          detail: `Pick the category that matches what your app does. ${BASIC_SETTINGS}`,
+        },
+  );
+
+  const domains = (app.app_domains ?? []).filter(present);
+  findings.push(
+    domains.length > 0
+      ? { id: 'app.domains', status: 'pass', title: `App domains are set (${domains.join(', ')})` }
+      : {
+          id: 'app.domains',
+          status: 'manual',
+          title: 'No app domains',
+          detail: `Add the domains your app runs on if it uses Facebook Login on the web. ${BASIC_SETTINGS}`,
+        },
+  );
+
+  findings.push(
+    present(app.deauth_callback_url)
+      ? { id: 'app.deauthorize', status: 'pass', title: 'Deauthorize callback URL is set' }
+      : {
+          id: 'app.deauthorize',
+          status: 'manual',
+          title: 'No deauthorize callback URL',
+          detail:
+            'If your app uses Facebook Login, set it in the Facebook Login settings so you know when people remove your app. See docs/callbacks.md.',
+        },
+  );
+
+  return findings;
+}
+
+async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): Promise<Finding[]> {
+  try {
+    const app = await fetchAppSettings(appId, appSecret, fetchImpl);
+    const name = present(app.name) ? ` (${app.name})` : '';
+    return [
+      { id: 'graph.app', status: 'pass', title: `Read the app settings${name}` },
+      ...checkAppSettings(app),
+    ];
+  } catch (error) {
+    const message = (error as Error).message.replace(/([^.])$/, '$1.');
+    const hint =
+      error instanceof GraphError && error.code !== undefined
+        ? ' Check that META_APP_ID and META_APP_SECRET belong to the same app.'
+        : '';
+    return [
+      {
+        id: 'graph.app',
+        status: 'blocking',
+        title: 'Could not read the app settings from the Graph API',
+        detail: `${message}${hint}`,
+      },
+    ];
+  }
+}
+
 /**
  * Runs the pre-submission checks and returns a report. It reads the app ID and secret
  * from the environment and never includes the secret in the report.
@@ -76,7 +185,11 @@ function checkAppSecret(appSecret: string | undefined): Finding {
 export async function runDoctor(options: DoctorOptions = {}): Promise<Report> {
   const env = options.env ?? process.env;
   const appId = env.META_APP_ID?.trim() || undefined;
-  const findings = [checkAppId(appId), checkAppSecret(env.META_APP_SECRET)];
+  const appSecret = env.META_APP_SECRET;
+  const findings = [checkAppId(appId), checkAppSecret(appSecret)];
+  if (appId && appSecret && findings.every((finding) => finding.status === 'pass')) {
+    findings.push(...(await checkGraph(appId, appSecret, options.fetch)));
+  }
 
   const summary: Record<FindingStatus, number> = { pass: 0, manual: 0, blocking: 0 };
   for (const finding of findings) summary[finding.status]++;
