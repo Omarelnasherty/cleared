@@ -13,7 +13,7 @@ describe('runDoctor', () => {
     const report = await runDoctor({ env, fetch: graph.fetch });
     expect(report.version).toBe(version);
     expect(report.appId).toBe('1234567890');
-    expect(report.summary).toEqual({ pass: 9, manual: 0, blocking: 0 });
+    expect(report.summary).toEqual({ pass: 12, manual: 0, blocking: 0 });
     expect(report.findings[2]?.title).toBe('Read the app settings (Example App)');
   });
 
@@ -25,6 +25,27 @@ describe('runDoctor', () => {
     expect(url?.pathname).toBe(`/${GRAPH_API_VERSION}/1234567890`);
     expect(url?.searchParams.get('access_token')).toBe(`1234567890|${secret}`);
     expect(url?.searchParams.get('fields')?.split(',')).toContain('privacy_policy_url');
+  });
+
+  test('loads the privacy policy and terms pages without the token', async () => {
+    const graph = fakeGraph(completeApp, 200, {
+      'https://example.com/privacy': { status: 302, location: '/login' },
+    });
+    const report = await runDoctor({ env, fetch: graph.fetch });
+    expect(graph.pageUrls.map((u) => u.href)).toEqual([
+      'https://example.com/privacy',
+      'https://example.com/terms',
+    ]);
+    expect(graph.pageUrls.some((u) => u.href.includes(secret))).toBe(false);
+    const statuses = Object.fromEntries(report.findings.map((f) => [f.id, f.status]));
+    expect(statuses['url.privacy-policy']).toBe('blocking');
+    expect(statuses['url.terms']).toBe('pass');
+  });
+
+  test('skips the page checks for URLs that are not set', async () => {
+    const graph = fakeGraph({ name: 'Empty' });
+    await runDoctor({ env, fetch: graph.fetch });
+    expect(graph.pageUrls).toHaveLength(0);
   });
 
   test('blocks when the Graph API rejects the credentials', async () => {

@@ -19,7 +19,7 @@ One small step at a time. Checked items are done.
 
 - [x] `cleared doctor` CLI skeleton: reads `META_APP_ID` and `META_APP_SECRET` from the environment, never prints or stores the secret, text and JSON output, exit code 1 on blocking issues
 - [x] App settings checks through the Graph API: privacy policy, terms, app icon, category, app domains, deauthorize callback
-- [ ] URL checks: HTTPS, loads without a login wall, no redirect to a sign-in page, privacy policy mentions how to request data deletion
+- [x] URL checks: HTTPS, loads without a login wall, no redirect to a sign-in page, privacy policy mentions how to request data deletion
 - [ ] Webhook checks: read `/{app-id}/subscriptions`, flag inactive ones, test the verify token handshake against the callback URL
 - [ ] Live callback test: send a signed test request to the data deletion URL and validate the response shape
 - [ ] Manual checklist in the report for what the API can't see: live mode, business verification, one API call per permission in the last 30 days

@@ -1,5 +1,6 @@
 import { type AppSettings, type Fetch, fetchAppSettings, GraphError } from './graph.js';
 import { version } from './index.js';
+import { checkPolicyPage, type PolicyPage } from './urls.js';
 
 /** pass: nothing to do. manual: check it yourself. blocking: fix it before you submit. */
 export type FindingStatus = 'pass' | 'manual' | 'blocking';
@@ -157,9 +158,23 @@ async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): 
   try {
     const app = await fetchAppSettings(appId, appSecret, fetchImpl);
     const name = present(app.name) ? ` (${app.name})` : '';
+    const pages: PolicyPage[] = [];
+    if (present(app.privacy_policy_url)) {
+      pages.push({
+        id: 'url.privacy-policy',
+        name: 'Privacy policy',
+        url: app.privacy_policy_url,
+        deletion: true,
+      });
+    }
+    if (present(app.terms_of_service_url)) {
+      pages.push({ id: 'url.terms', name: 'Terms of service', url: app.terms_of_service_url });
+    }
+    const pageFindings = await Promise.all(pages.map((page) => checkPolicyPage(page, fetchImpl)));
     return [
       { id: 'graph.app', status: 'pass', title: `Read the app settings${name}` },
       ...checkAppSettings(app),
+      ...pageFindings.flat(),
     ];
   } catch (error) {
     const message = (error as Error).message.replace(/([^.])$/, '$1.');
