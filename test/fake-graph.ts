@@ -17,13 +17,15 @@ export const policyHtml =
 export type Page = { status?: number; html?: string; location?: string };
 
 /**
- * A fetch that answers like the Graph API for graph.facebook.com and serves `pages`
+ * A fetch that answers like the Graph API for graph.facebook.com, with `body` for the app
+ * node and `subscriptions` for its subscriptions edge, and serves `pages`
  * for any other URL. It records the Graph API URLs and the page URLs separately.
  */
 export function fakeGraph(
   body: unknown = completeApp,
   status = 200,
   pages: Record<string, Page> = {},
+  subscriptions: unknown = { data: [] },
 ) {
   const urls: URL[] = [];
   const pageUrls: URL[] = [];
@@ -31,10 +33,11 @@ export function fakeGraph(
     const url = new URL(input instanceof Request ? input.url : input);
     if (url.hostname === 'graph.facebook.com') {
       urls.push(url);
+      if (url.pathname.endsWith('/subscriptions')) return Response.json(subscriptions);
       return Response.json(body, { status });
     }
     pageUrls.push(url);
-    const page = pages[url.href] ?? { html: policyHtml };
+    const page = pages[url.href] ?? pages[url.origin + url.pathname] ?? { html: policyHtml };
     const headers = new Headers({ 'content-type': 'text/html' });
     if (page.location) headers.set('location', page.location);
     return new Response(page.html ?? '', { status: page.status ?? 200, headers });

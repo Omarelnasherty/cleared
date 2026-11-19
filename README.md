@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API and your policy pages; the webhook and callback checks come next. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages and your webhook subscriptions; the live callback test comes next. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -189,6 +189,8 @@ npx cleared doctor
 It reads your app settings through the Graph API with an app access token and checks the privacy policy URL, terms of service URL, app icon, category, app domains and deauthorize callback URL.
 
 Then it loads your privacy policy and terms of service the way a reviewer would. A page must use HTTPS, load without a login and not redirect to a sign-in page. The privacy policy should also explain how people can ask for their data to be deleted; if the doctor can't find a mention of deletion in the page HTML, it asks you to check by hand.
+
+It also reads your webhook subscriptions. An inactive subscription or a callback that isn't reachable over HTTPS is blocking. To test the verification handshake, it sends each callback a `GET` with `hub.mode=subscribe`, a random `hub.challenge` and a random `hub.verify_token`. Your real verify token is never sent, so a correct endpoint answers 403; if it echoes the challenge, the doctor asks you to fix the token check.
 
 It prints a report with a green check for what passed, an amber `!` for what you need to check by hand and a red cross for what blocks your submission. It exits with 1 when something is blocking, so you can run it in CI. Add `--json` for a machine-readable report.
 

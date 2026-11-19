@@ -1,6 +1,13 @@
-import { type AppSettings, type Fetch, fetchAppSettings, GraphError } from './graph.js';
+import {
+  type AppSettings,
+  type Fetch,
+  fetchAppSettings,
+  fetchSubscriptions,
+  GraphError,
+} from './graph.js';
 import { version } from './index.js';
 import { checkPolicyPage, type PolicyPage } from './urls.js';
+import { checkWebhooks } from './webhooks.js';
 
 /** pass: nothing to do. manual: check it yourself. blocking: fix it before you submit. */
 export type FindingStatus = 'pass' | 'manual' | 'blocking';
@@ -154,6 +161,26 @@ export function checkAppSettings(app: AppSettings): Finding[] {
   return findings;
 }
 
+async function checkSubscriptions(
+  appId: string,
+  appSecret: string,
+  fetchImpl?: Fetch,
+): Promise<Finding[]> {
+  try {
+    const subscriptions = await fetchSubscriptions(appId, appSecret, fetchImpl);
+    return checkWebhooks(subscriptions, fetchImpl);
+  } catch (error) {
+    return [
+      {
+        id: 'graph.subscriptions',
+        status: 'manual',
+        title: 'Could not read the webhook subscriptions from the Graph API',
+        detail: `${(error as Error).message.replace(/([^.])$/, '$1.')} Check them in Webhooks in the App Dashboard.`,
+      },
+    ];
+  }
+}
+
 async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): Promise<Finding[]> {
   try {
     const app = await fetchAppSettings(appId, appSecret, fetchImpl);
@@ -170,11 +197,15 @@ async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): 
     if (present(app.terms_of_service_url)) {
       pages.push({ id: 'url.terms', name: 'Terms of service', url: app.terms_of_service_url });
     }
-    const pageFindings = await Promise.all(pages.map((page) => checkPolicyPage(page, fetchImpl)));
+    const [pageFindings, webhookFindings] = await Promise.all([
+      Promise.all(pages.map((page) => checkPolicyPage(page, fetchImpl))),
+      checkSubscriptions(appId, appSecret, fetchImpl),
+    ]);
     return [
       { id: 'graph.app', status: 'pass', title: `Read the app settings${name}` },
       ...checkAppSettings(app),
       ...pageFindings.flat(),
+      ...webhookFindings,
     ];
   } catch (error) {
     const message = (error as Error).message.replace(/([^.])$/, '$1.');

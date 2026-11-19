@@ -37,15 +37,24 @@ export class GraphError extends Error {
 
 export type Fetch = typeof globalThis.fetch;
 
-/** Reads the app settings with an app access token built from the app ID and secret. */
-export async function fetchAppSettings(
+/** A webhook subscription, as the Graph API returns it on `/{app-id}/subscriptions`. */
+export interface Subscription {
+  object?: string;
+  callback_url?: string;
+  active?: boolean;
+  fields?: { name?: string; version?: string }[];
+}
+
+async function graphGet(
+  path: string,
+  params: Record<string, string>,
   appId: string,
   appSecret: string,
-  fetchImpl: Fetch = globalThis.fetch,
-): Promise<AppSettings> {
+  fetchImpl: Fetch,
+): Promise<unknown> {
   if (!/^\d+$/.test(appId)) throw new GraphError('The app ID must contain only digits.');
-  const url = new URL(`/${GRAPH_API_VERSION}/${appId}`, GRAPH_URL);
-  url.searchParams.set('fields', APP_FIELDS.join(','));
+  const url = new URL(`/${GRAPH_API_VERSION}/${appId}${path}`, GRAPH_URL);
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
   url.searchParams.set('access_token', `${appId}|${appSecret}`);
   const redact = (text: string) => text.split(appSecret).join('[secret]');
 
@@ -68,5 +77,26 @@ export async function fetchAppSettings(
     const code = typeof error?.code === 'number' ? error.code : undefined;
     throw new GraphError(redact(message), code);
   }
-  return body as AppSettings;
+  return body;
+}
+
+/** Reads the app settings with an app access token built from the app ID and secret. */
+export async function fetchAppSettings(
+  appId: string,
+  appSecret: string,
+  fetchImpl: Fetch = globalThis.fetch,
+): Promise<AppSettings> {
+  const fields = APP_FIELDS.join(',');
+  return (await graphGet('', { fields }, appId, appSecret, fetchImpl)) as AppSettings;
+}
+
+/** Reads the app's webhook subscriptions with an app access token. */
+export async function fetchSubscriptions(
+  appId: string,
+  appSecret: string,
+  fetchImpl: Fetch = globalThis.fetch,
+): Promise<Subscription[]> {
+  const body = await graphGet('/subscriptions', {}, appId, appSecret, fetchImpl);
+  const data = (body as { data?: unknown }).data;
+  return Array.isArray(data) ? (data as Subscription[]) : [];
 }
