@@ -21,7 +21,7 @@ One small step at a time. Checked items are done.
 - [x] App settings checks through the Graph API: privacy policy, terms, app icon, category, app domains, deauthorize callback
 - [x] URL checks: HTTPS, loads without a login wall, no redirect to a sign-in page, privacy policy mentions how to request data deletion
 - [x] Webhook checks: read `/{app-id}/subscriptions`, flag inactive ones, test the verify token handshake against the callback URL
-- [ ] Live callback test: send a signed test request to the data deletion URL and validate the response shape
+- [x] Live callback test: send a signed test request to the data deletion URL and validate the response shape
 - [ ] Manual checklist in the report for what the API can't see: live mode, business verification, one API call per permission in the last 30 days
 - [ ] Rejection pages for app settings, policy URLs and webhooks, same format, and link each doctor finding to its page
 - [ ] Prepare 0.2.0

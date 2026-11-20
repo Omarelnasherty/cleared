@@ -53,6 +53,13 @@ describe('cleared', () => {
     expect((await run(['doctor'], { ...env, FORCE_COLOR: '1' })).stdout).toContain('\x1b[');
   });
 
+  test('doctor --deletion-url tests the data deletion callback', async () => {
+    const { code, stdout } = await run(['doctor', '--deletion-url', 'http://example.com/del'], env);
+    expect(code).toBe(1);
+    expect(stdout).toContain('The data deletion callback failed the test request');
+    expect(stdout).not.toContain(secret);
+  });
+
   test('prints help and the version', async () => {
     expect((await run([])).stdout).toContain('Usage: cleared');
     expect((await run(['--help'])).code).toBe(0);

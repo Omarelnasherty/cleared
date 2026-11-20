@@ -13,7 +13,7 @@ describe('runDoctor', () => {
     const report = await runDoctor({ env, fetch: graph.fetch });
     expect(report.version).toBe(version);
     expect(report.appId).toBe('1234567890');
-    expect(report.summary).toEqual({ pass: 12, manual: 0, blocking: 0 });
+    expect(report.summary).toEqual({ pass: 12, manual: 1, blocking: 0 });
     expect(report.findings[2]?.title).toBe('Read the app settings (Example App)');
   });
 
@@ -58,6 +58,7 @@ describe('runDoctor', () => {
       ['env.app-id', 'pass'],
       ['env.app-secret', 'pass'],
       ['graph.app', 'blocking'],
+      ['callback.deletion', 'manual'],
     ]);
     expect(report.findings[2]?.detail).toBe(
       'Error validating client secret. Check that META_APP_ID and META_APP_SECRET belong to the same app.',

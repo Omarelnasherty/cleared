@@ -18,9 +18,10 @@ Commands:
   doctor    Check your app before you submit it for Meta App Review
 
 Options:
-  --json         Print the report as JSON
-  -h, --help     Show this help
-  -v, --version  Show the version
+  --json                Print the report as JSON
+  --deletion-url <url>  Send a signed test request to your data deletion callback
+  -h, --help            Show this help
+  -v, --version         Show the version
 
 The doctor reads META_APP_ID and META_APP_SECRET from the environment
 and reads your app settings through the Graph API.
@@ -57,7 +58,11 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
     return 2;
   }
 
-  const report = await runDoctor({ env: io.env, ...(io.fetch && { fetch: io.fetch }) });
+  const report = await runDoctor({
+    env: io.env,
+    ...(io.fetch && { fetch: io.fetch }),
+    ...(values['deletion-url'] !== undefined && { deletionUrl: values['deletion-url'] }),
+  });
   io.stdout(
     values.json
       ? `${JSON.stringify(report, null, 2)}\n`
@@ -72,6 +77,7 @@ function parse(argv: string[]) {
     allowPositionals: true,
     options: {
       json: { type: 'boolean' },
+      'deletion-url': { type: 'string' },
       help: { type: 'boolean', short: 'h' },
       version: { type: 'boolean', short: 'v' },
     },

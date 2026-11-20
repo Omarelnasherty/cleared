@@ -63,6 +63,8 @@ META_APP_SECRET=... node examples/express/send-test-request.js https://example.c
 
 You should get a 200 with `url` and `confirmation_code`, and the `url` should open the status page with the state "Completed". A 400 with `Signature does not match` means the server is using a different secret than the one you signed with.
 
+Once the callback is deployed, `npx cleared doctor --deletion-url https://example.com/meta/deletion` runs the same test against it, checks the status page and checks that a wrong signature is rejected.
+
 ## When Meta reports a problem
 
 If a user sees "Unable to confirm request was received" or you get a "User Data Deletion Request" email, the [rejection pages](rejections/README.md) explain what each message means and how to fix it.

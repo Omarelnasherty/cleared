@@ -1,3 +1,4 @@
+import { checkDeletionCallback } from './callback-test.js';
 import {
   type AppSettings,
   type Fetch,
@@ -34,6 +35,11 @@ export interface DoctorOptions {
   env?: Record<string, string | undefined>;
   /** The fetch used for Graph API calls. Default the global fetch. */
   fetch?: Fetch;
+  /**
+   * Your data deletion callback URL. When set, the doctor sends it a signed test request
+   * for user ID 0 and checks the answer.
+   */
+  deletionUrl?: string;
 }
 
 const DASHBOARD_HINT = 'Copy it from App settings > Basic in the App Dashboard.';
@@ -224,6 +230,16 @@ async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): 
   }
 }
 
+function deletionCallbackSkipped(): Finding {
+  return {
+    id: 'callback.deletion',
+    status: 'manual',
+    title: 'Data deletion callback not tested',
+    detail:
+      'If you use a data deletion callback, run the doctor again with --deletion-url <url> to send it a signed test request. If you use a deletion instructions URL instead, check that the page loads.',
+  };
+}
+
 /**
  * Runs the pre-submission checks and returns a report. It reads the app ID and secret
  * from the environment and never includes the secret in the report.
@@ -234,7 +250,14 @@ export async function runDoctor(options: DoctorOptions = {}): Promise<Report> {
   const appSecret = env.META_APP_SECRET;
   const findings = [checkAppId(appId), checkAppSecret(appSecret)];
   if (appId && appSecret && findings.every((finding) => finding.status === 'pass')) {
-    findings.push(...(await checkGraph(appId, appSecret, options.fetch)));
+    const deletionUrl = options.deletionUrl?.trim();
+    const [graphFindings, callbackFindings] = await Promise.all([
+      checkGraph(appId, appSecret, options.fetch),
+      deletionUrl
+        ? checkDeletionCallback(deletionUrl, appSecret, options.fetch)
+        : [deletionCallbackSkipped()],
+    ]);
+    findings.push(...graphFindings, ...callbackFindings);
   }
 
   const summary: Record<FindingStatus, number> = { pass: 0, manual: 0, blocking: 0 };
