@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { manualChecklist } from '../src/checklist.js';
 import { checkAppSettings, formatReport, runDoctor } from '../src/doctor.js';
 import { GRAPH_API_VERSION } from '../src/graph.js';
 import { version } from '../src/index.js';
@@ -6,6 +7,7 @@ import { completeApp, fakeGraph } from './fake-graph.js';
 
 const secret = 'test-secret-0123456789abcdef';
 const env = { META_APP_ID: '1234567890', META_APP_SECRET: secret };
+const checklist = manualChecklist().map((f) => [f.id, f.status]);
 
 describe('runDoctor', () => {
   test('passes a complete app', async () => {
@@ -13,7 +15,7 @@ describe('runDoctor', () => {
     const report = await runDoctor({ env, fetch: graph.fetch });
     expect(report.version).toBe(version);
     expect(report.appId).toBe('1234567890');
-    expect(report.summary).toEqual({ pass: 12, manual: 1, blocking: 0 });
+    expect(report.summary).toEqual({ pass: 12, manual: 4, blocking: 0 });
     expect(report.findings[2]?.title).toBe('Read the app settings (Example App)');
   });
 
@@ -59,6 +61,7 @@ describe('runDoctor', () => {
       ['env.app-secret', 'pass'],
       ['graph.app', 'blocking'],
       ['callback.deletion', 'manual'],
+      ...checklist,
     ]);
     expect(report.findings[2]?.detail).toBe(
       'Error validating client secret. Check that META_APP_ID and META_APP_SECRET belong to the same app.',
@@ -82,6 +85,7 @@ describe('runDoctor', () => {
     expect(report.findings.map((f) => [f.id, f.status])).toEqual([
       ['env.app-id', 'blocking'],
       ['env.app-secret', 'blocking'],
+      ...checklist,
     ]);
   });
 
@@ -139,6 +143,27 @@ describe('checkAppSettings', () => {
   });
 });
 
+describe('manualChecklist', () => {
+  test('adds the checks the API cannot see to every report', async () => {
+    const report = await runDoctor({ env: {} });
+    const ids = report.findings.filter((f) => f.id.startsWith('manual.')).map((f) => f.id);
+    expect(ids).toEqual(['manual.api-calls', 'manual.business-verification', 'manual.live-mode']);
+  });
+
+  test('marks every item as manual with a detail', () => {
+    for (const finding of manualChecklist()) {
+      expect(finding.status).toBe('manual');
+      expect(finding.detail).toBeTruthy();
+    }
+  });
+
+  test('asks for one API call per permission in the last 30 days', () => {
+    const [calls] = manualChecklist();
+    expect(calls?.detail).toMatch(/30 days/);
+    expect(calls?.detail).toMatch(/Graph API Explorer/);
+  });
+});
+
 describe('formatReport', () => {
   test('lists blocking issues first and ends with the contact line', async () => {
     const text = formatReport(await runDoctor({ env: { META_APP_ID: '1234567890' } }));
@@ -148,9 +173,10 @@ describe('formatReport', () => {
         '',
         '  ✗ META_APP_SECRET is not set',
         '    Copy it from App settings > Basic in the App Dashboard. Keep it in your environment or a secret manager, never in your code.',
+        ...manualChecklist().flatMap((f) => [`  ! ${f.title}`, `    ${f.detail}`]),
         '  ✓ META_APP_ID is set (1234567890)',
         '',
-        '1 blocking, 0 to check by hand, 1 passed.',
+        '1 blocking, 3 to check by hand, 1 passed.',
         '',
         'Still blocked after fixing these? contact@omarelnasherty.com',
         '',

@@ -1,4 +1,5 @@
 import { checkDeletionCallback } from './callback-test.js';
+import { manualChecklist } from './checklist.js';
 import {
   type AppSettings,
   type Fetch,
@@ -259,6 +260,7 @@ export async function runDoctor(options: DoctorOptions = {}): Promise<Report> {
     ]);
     findings.push(...graphFindings, ...callbackFindings);
   }
+  findings.push(...manualChecklist());
 
   const summary: Record<FindingStatus, number> = { pass: 0, manual: 0, blocking: 0 };
   for (const finding of findings) summary[finding.status]++;

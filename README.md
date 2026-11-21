@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -199,6 +199,8 @@ npx cleared doctor --deletion-url https://example.com/meta/deletion
 ```
 
 The doctor signs a test request with your app secret, the same way Meta does, for user ID `0`, and posts it to the URL. It expects a 200 with a JSON `url` and `confirmation_code`, and then loads the status page at that `url`. It also sends a request with a wrong signature, which your callback should reject. Your `onDelete` runs for user `0`, so make sure it does nothing for a user it doesn't know.
+
+Some requirements can't be read through the API, so every report also lists them as checks to do by hand: a successful API call with each permission you request in the 30 days before you submit, business verification if you need advanced access, and switching to Live mode only after approval.
 
 It prints a report with a green check for what passed, an amber `!` for what you need to check by hand and a red cross for what blocks your submission. It exits with 1 when something is blocking, so you can run it in CI. Add `--json` for a machine-readable report.
 

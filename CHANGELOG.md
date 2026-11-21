@@ -7,6 +7,7 @@
 - `cleared doctor` loads the privacy policy and terms of service pages and blocks when one is not HTTPS, needs a login, redirects to a sign-in page or fails to load. It also flags a privacy policy that doesn't mention data deletion.
 - `cleared doctor` reads the webhook subscriptions, blocks on inactive ones or a callback that can't be reached over HTTPS, and sends each callback a verification request with a random verify token to check that it rejects tokens it doesn't know.
 - `cleared doctor --deletion-url <url>` sends the data deletion callback a signed test request for user ID 0, blocks unless it answers 200 with `url` and `confirmation_code`, loads the status page and checks that a wrong signature is rejected.
+- `cleared doctor` ends every report with the checks the Graph API can't answer: one successful API call per permission in the 30 days before you submit, business verification, and when to switch to Live mode.
 
 ## 0.1.0 (2026-11-15)
 
