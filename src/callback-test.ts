@@ -2,6 +2,7 @@ import { createHmac, randomBytes } from 'node:crypto';
 import type { Finding } from './doctor.js';
 import type { Fetch } from './graph.js';
 import { version } from './index.js';
+import { rejectionPageUrl } from './rejections.js';
 
 const TIMEOUT_MS = 10_000;
 const CALLBACK_DOCS =
@@ -87,6 +88,7 @@ export async function checkDeletionCallback(
       status: 'blocking',
       title: 'The data deletion callback failed the test request',
       detail: `${detail} See docs/callbacks.md and ${CALLBACK_DOCS}`,
+      docs: rejectionPageUrl('deletionUnconfirmed'),
     },
   ];
 

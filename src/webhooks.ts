@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { Finding } from './doctor.js';
 import type { Fetch, Subscription } from './graph.js';
 import { version } from './index.js';
+import { rejectionPageUrl } from './rejections.js';
 
 const TIMEOUT_MS = 10_000;
 const WEBHOOKS_DOCS = 'https://developers.facebook.com/docs/graph-api/webhooks/getting-started';
@@ -17,6 +18,7 @@ async function testHandshake(callbackUrl: string, fetchImpl: Fetch): Promise<Han
     status: 'blocking',
     title: `Webhook callback ${callbackUrl} is not reachable`,
     detail: `${detail} Meta can only deliver events to a public HTTPS URL with a valid certificate. See ${WEBHOOKS_DOCS}`,
+    docs: rejectionPageUrl('webhookVerificationFailed'),
   });
 
   let url: URL;
@@ -51,6 +53,7 @@ async function testHandshake(callbackUrl: string, fetchImpl: Fetch): Promise<Han
       status: 'manual',
       title: `Webhook callback ${callbackUrl} redirects`,
       detail: `It answers ${status}${location ? ` to ${location}` : ''}. Set the callback URL to the final address.`,
+      docs: rejectionPageUrl('webhookVerificationFailed'),
     };
   }
   if (status === 404) {
@@ -58,6 +61,7 @@ async function testHandshake(callbackUrl: string, fetchImpl: Fetch): Promise<Han
       status: 'manual',
       title: `Webhook callback ${callbackUrl} answers 404`,
       detail: 'Check that the path is right and that the route handles GET requests.',
+      docs: rejectionPageUrl('webhookVerificationFailed'),
     };
   }
   if (status >= 400) {
@@ -68,14 +72,17 @@ async function testHandshake(callbackUrl: string, fetchImpl: Fetch): Promise<Han
   }
 
   const body = await response.text().catch(() => '');
+  const echoed = body.trim() === challenge;
   return {
     status: 'manual',
     title: `Webhook callback ${callbackUrl} accepts a wrong verify token`,
     detail: `${
-      body.trim() === challenge
+      echoed
         ? 'It echoed the challenge for a random token.'
-        : `It answered ${status} to a random token.`
+        : `It answered ${status} to a random token without echoing the challenge.`
     } Compare hub.verify_token with your own token and answer 403 when they differ.`,
+    // Not echoing the challenge here usually means it won't echo it for the real token either.
+    ...(!echoed && { docs: rejectionPageUrl('webhookChallenge') }),
   };
 }
 

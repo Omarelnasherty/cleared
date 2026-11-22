@@ -184,6 +184,17 @@ describe('formatReport', () => {
     );
   });
 
+  test('prints the rejection page under a finding that has one', () => {
+    const docs = 'https://example.com/page.md';
+    const text = formatReport({
+      version,
+      appId: '1',
+      findings: [{ id: 'x', status: 'manual', title: 'Title', detail: 'Detail.', docs }],
+      summary: { pass: 0, manual: 1, blocking: 0 },
+    });
+    expect(text).toContain(`  ! Title\n    Detail.\n    See ${docs}\n`);
+  });
+
   test('has no contact line without blocking issues', async () => {
     const text = formatReport(await runDoctor({ env, fetch: fakeGraph().fetch }));
     expect(text).not.toContain('contact@');

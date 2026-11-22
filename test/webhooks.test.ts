@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { runDoctor } from '../src/doctor.js';
 import type { Subscription } from '../src/graph.js';
+import { rejectionPageUrl } from '../src/rejections.js';
 import { checkWebhooks } from '../src/webhooks.js';
 import { fakeGraph, type Page } from './fake-graph.js';
 
@@ -63,6 +64,16 @@ describe('checkWebhooks', () => {
     expect(findings[1]).toMatchObject({ status: 'manual' });
     expect(findings[1]?.title).toContain('accepts a wrong verify token');
     expect(findings[1]?.detail).toContain('echoed the challenge');
+    expect(findings[1]?.docs).toBeUndefined();
+  });
+
+  test('links a callback that answers 200 without the challenge to its rejection page', async () => {
+    const ok = async () => new Response('OK');
+    const findings = await checkWebhooks([page], ok as typeof fetch);
+    expect(findings[1]).toMatchObject({
+      status: 'manual',
+      docs: rejectionPageUrl('webhookChallenge'),
+    });
   });
 
   test('blocks a callback that is not HTTPS without calling it', async () => {
@@ -76,6 +87,7 @@ describe('checkWebhooks', () => {
     const { findings } = await check([page], { [hook]: { status: 502 } });
     expect(findings[1]).toMatchObject({ status: 'blocking' });
     expect(findings[1]?.detail).toContain('answers 502');
+    expect(findings[1]?.docs).toBe(rejectionPageUrl('webhookVerificationFailed'));
 
     const down = async () => {
       throw new Error('getaddrinfo ENOTFOUND example.com');
@@ -87,7 +99,10 @@ describe('checkWebhooks', () => {
 
   test('flags a callback that answers 404 or redirects', async () => {
     const missing = await check([page], { [hook]: { status: 404 } });
-    expect(missing.findings[1]).toMatchObject({ status: 'manual' });
+    expect(missing.findings[1]).toMatchObject({
+      status: 'manual',
+      docs: rejectionPageUrl('webhookVerificationFailed'),
+    });
 
     const moved = await check([page], { [hook]: { status: 301, location: '/hooks' } });
     expect(moved.findings[1]).toMatchObject({ status: 'manual' });

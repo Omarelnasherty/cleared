@@ -21,6 +21,8 @@ export interface Finding {
   title: string;
   /** What to do about it. Set for manual and blocking findings. */
   detail?: string;
+  /** A page in docs/rejections that explains the message Meta shows for this problem. */
+  docs?: string;
 }
 
 export interface Report {
@@ -291,6 +293,7 @@ export function formatReport(report: Report, options: FormatOptions = {}): strin
   for (const finding of findings) {
     lines.push(`  ${paint(finding.status, MARKS[finding.status].symbol)} ${finding.title}`);
     if (finding.detail) lines.push(`    ${finding.detail}`);
+    if (finding.docs) lines.push(`    See ${finding.docs}`);
   }
 
   const { blocking, manual, pass } = report.summary;

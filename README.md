@@ -192,6 +192,8 @@ Then it loads your privacy policy and terms of service the way a reviewer would.
 
 It also reads your webhook subscriptions. An inactive subscription or a callback that isn't reachable over HTTPS is blocking. To test the verification handshake, it sends each callback a `GET` with `hub.mode=subscribe`, a random `hub.challenge` and a random `hub.verify_token`. Your real verify token is never sent, so a correct endpoint answers 403; if it echoes the challenge, the doctor asks you to fix the token check.
 
+When a finding matches a message Meta shows, the report links to the [rejection page](docs/rejections/README.md) for it.
+
 To test your data deletion callback, pass its URL:
 
 ```
@@ -208,7 +210,7 @@ The secret is only read from the environment. The doctor sends it only to graph.
 
 ## Callbacks guide
 
-[docs/callbacks.md](docs/callbacks.md) covers where the URLs go in the App Dashboard, what to change before going live, and how to test with a signed request. [examples/express](examples/express) is a working app you can run locally. If Meta reports a problem with a callback, look up the exact message in [docs/rejections](docs/rejections/README.md).
+[docs/callbacks.md](docs/callbacks.md) covers where the URLs go in the App Dashboard, what to change before going live, and how to test with a signed request. [examples/express](examples/express) is a working app you can run locally. If Meta reports a problem with a callback or a webhook, look up the exact message in [docs/rejections](docs/rejections/README.md).
 
 ## Still stuck?
 

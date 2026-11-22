@@ -23,7 +23,8 @@ One small step at a time. Checked items are done.
 - [x] Webhook checks: read `/{app-id}/subscriptions`, flag inactive ones, test the verify token handshake against the callback URL
 - [x] Live callback test: send a signed test request to the data deletion URL and validate the response shape
 - [x] Manual checklist in the report for what the API can't see: live mode, business verification, one API call per permission in the last 30 days
-- [ ] Rejection pages for app settings, policy URLs and webhooks, same format, and link each doctor finding to its page
+- [x] Rejection pages for webhooks, same format, and link each doctor finding that matches a page to it
+- [ ] Rejection pages for app settings and policy URLs, same format, linked from the doctor findings
 - [ ] Prepare 0.2.0
 
 ## 0.3 Playbooks

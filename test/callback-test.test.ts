@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { checkDeletionCallback, signRequest, TEST_USER_ID } from '../src/callback-test.js';
 import { runDoctor } from '../src/doctor.js';
 import { createDataDeletionHandler, parseSignedRequest } from '../src/index.js';
+import { rejectionPageUrl } from '../src/rejections.js';
 import { fakeGraph } from './fake-graph.js';
 
 const secret = 'test-secret-0123456789abcdef';
@@ -97,6 +98,7 @@ describe('checkDeletionCallback', () => {
     const findings = await checkDeletionCallback(callback, secret, server(other).fetch);
     expect(statuses(findings)).toEqual([['callback.deletion', 'blocking']]);
     expect(findings[0]?.detail).toContain('different app secret');
+    expect(findings[0]?.docs).toBe(rejectionPageUrl('deletionUnconfirmed'));
   });
 
   test('blocks an answer without url or confirmation_code', async () => {

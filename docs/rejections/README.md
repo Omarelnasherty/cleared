@@ -15,6 +15,17 @@ A message gets a page only when its wording appears in Meta's documentation or i
 
 Meta doesn't report failed deauthorize calls: it sends the request once and doesn't show an error to you or the user. If your hook never runs, check the URL in the Facebook Login settings and test it with a signed request as described in the [callbacks guide](../callbacks.md#test-it).
 
+## Webhooks
+
+| Message                                                                                                                                               | Where you see it                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [The URL couldn't be validated. Callback verification failed with the following errors](the-url-couldnt-be-validated-callback-verification-failed.md) | The App Dashboard, when you verify and save a callback URL |
+| [The URL couldn't be validated. Response does not match challenge](the-url-couldnt-be-validated-response-does-not-match-challenge.md)                 | The App Dashboard, when you verify and save a callback URL |
+
+## From the doctor
+
+When a `cleared doctor` finding matches one of these messages, the report links to its page, in the text output and as `docs` in the JSON.
+
 ## Format
 
 Every page has the same parts:

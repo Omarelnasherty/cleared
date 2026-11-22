@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
+import { REJECTION_PAGES, rejectionPageUrl } from '../src/rejections.js';
 
 const dir = fileURLToPath(new URL('../docs/rejections/', import.meta.url));
 const index = readFileSync(join(dir, 'README.md'), 'utf8');
@@ -24,5 +25,15 @@ describe('rejection pages', () => {
     for (const [, target = ''] of text.matchAll(/\]\(([^)#:]+)(?:#[^)]*)?\)/g)) {
       expect(existsSync(join(dir, target)), target).toBe(true);
     }
+  });
+
+  test.each(Object.values(REJECTION_PAGES))('the doctor links to %s, which exists', (name) => {
+    expect(pages).toContain(name);
+  });
+
+  test('links point to the docs on the main branch', () => {
+    expect(rejectionPageUrl('webhookChallenge')).toBe(
+      `https://github.com/Omarelnasherty/cleared/blob/main/docs/rejections/${REJECTION_PAGES.webhookChallenge}`,
+    );
   });
 });
