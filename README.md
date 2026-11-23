@@ -210,7 +210,7 @@ The secret is only read from the environment. The doctor sends it only to graph.
 
 ## Callbacks guide
 
-[docs/callbacks.md](docs/callbacks.md) covers where the URLs go in the App Dashboard, what to change before going live, and how to test with a signed request. [examples/express](examples/express) is a working app you can run locally. If Meta reports a problem with a callback or a webhook, look up the exact message in [docs/rejections](docs/rejections/README.md).
+[docs/callbacks.md](docs/callbacks.md) covers where the URLs go in the App Dashboard, what to change before going live, and how to test with a signed request. [examples/express](examples/express) is a working app you can run locally. If Meta reports a problem with a callback, a webhook or your privacy policy URL, look up the exact message in [docs/rejections](docs/rejections/README.md).
 
 ## Still stuck?
 

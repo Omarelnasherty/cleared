@@ -24,7 +24,8 @@ One small step at a time. Checked items are done.
 - [x] Live callback test: send a signed test request to the data deletion URL and validate the response shape
 - [x] Manual checklist in the report for what the API can't see: live mode, business verification, one API call per permission in the last 30 days
 - [x] Rejection pages for webhooks, same format, and link each doctor finding that matches a page to it
-- [ ] Rejection pages for app settings and policy URLs, same format, linked from the doctor findings
+- [x] Rejection pages for app settings and policy URLs, same format, linked from the doctor findings: `Invalid Privacy Policy URL`
+- [ ] More app settings rejection pages: the app icon, the category and the email about a privacy policy URL that returns an error, once their exact wording is confirmed from Meta's docs or public developer reports. Move any that can't be confirmed to Later
 - [ ] Prepare 0.2.0
 
 ## 0.3 Playbooks

@@ -3,6 +3,7 @@ import { manualChecklist } from '../src/checklist.js';
 import { checkAppSettings, formatReport, runDoctor } from '../src/doctor.js';
 import { GRAPH_API_VERSION } from '../src/graph.js';
 import { version } from '../src/index.js';
+import { rejectionPageUrl } from '../src/rejections.js';
 import { completeApp, fakeGraph } from './fake-graph.js';
 
 const secret = 'test-secret-0123456789abcdef';
@@ -42,6 +43,9 @@ describe('runDoctor', () => {
     const statuses = Object.fromEntries(report.findings.map((f) => [f.id, f.status]));
     expect(statuses['url.privacy-policy']).toBe('blocking');
     expect(statuses['url.terms']).toBe('pass');
+    const docs = Object.fromEntries(report.findings.map((f) => [f.id, f.docs]));
+    expect(docs['url.privacy-policy']).toBe(rejectionPageUrl('invalidPrivacyPolicy'));
+    expect(docs['url.terms']).toBeUndefined();
   });
 
   test('skips the page checks for URLs that are not set', async () => {
@@ -140,6 +144,14 @@ describe('checkAppSettings', () => {
     const result = statuses({ ...completeApp, privacy_policy_url: ' ', app_domains: [''] });
     expect(result['app.privacy-policy']).toBe('blocking');
     expect(result['app.domains']).toBe('manual');
+  });
+
+  test('links a missing privacy policy to its rejection page', () => {
+    const findings = checkAppSettings({ name: 'Empty' });
+    expect(findings.find((f) => f.id === 'app.privacy-policy')?.docs).toBe(
+      rejectionPageUrl('invalidPrivacyPolicy'),
+    );
+    expect(findings.find((f) => f.id === 'app.icon')?.docs).toBeUndefined();
   });
 });
 

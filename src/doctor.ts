@@ -8,6 +8,7 @@ import {
   GraphError,
 } from './graph.js';
 import { version } from './index.js';
+import { rejectionPageUrl } from './rejections.js';
 import { checkPolicyPage, type PolicyPage } from './urls.js';
 import { checkWebhooks } from './webhooks.js';
 
@@ -107,6 +108,7 @@ export function checkAppSettings(app: AppSettings): Finding[] {
           status: 'blocking',
           title: 'Privacy policy URL is missing',
           detail: `Apps need a public privacy policy to go live and to pass review. ${BASIC_SETTINGS}`,
+          docs: rejectionPageUrl('invalidPrivacyPolicy'),
         },
   );
 
@@ -201,6 +203,7 @@ async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): 
         name: 'Privacy policy',
         url: app.privacy_policy_url,
         deletion: true,
+        docs: rejectionPageUrl('invalidPrivacyPolicy'),
       });
     }
     if (present(app.terms_of_service_url)) {

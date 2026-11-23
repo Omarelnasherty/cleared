@@ -15,6 +15,12 @@ A message gets a page only when its wording appears in Meta's documentation or i
 
 Meta doesn't report failed deauthorize calls: it sends the request once and doesn't show an error to you or the user. If your hook never runs, check the URL in the Facebook Login settings and test it with a signed request as described in the [callbacks guide](../callbacks.md#test-it).
 
+## App settings and policy URLs
+
+| Message                                                     | Where you see it                                        |
+| ----------------------------------------------------------- | ------------------------------------------------------- |
+| [Invalid Privacy Policy URL](invalid-privacy-policy-url.md) | The App Dashboard, when you switch the app to Live mode |
+
 ## Webhooks
 
 | Message                                                                                                                                               | Where you see it                                           |

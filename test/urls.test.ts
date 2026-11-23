@@ -1,15 +1,15 @@
 import { describe, expect, test } from 'vitest';
-import { checkPolicyPage } from '../src/urls.js';
+import { checkPolicyPage, type PolicyPage } from '../src/urls.js';
 import { fakeGraph, type Page } from './fake-graph.js';
 
-const privacy = {
+const privacy: PolicyPage = {
   id: 'url.privacy-policy',
   name: 'Privacy policy',
   url: 'https://example.com/privacy',
   deletion: true,
 };
 
-async function check(pages: Record<string, Page>, page: typeof privacy = privacy) {
+async function check(pages: Record<string, Page>, page: PolicyPage = privacy) {
   const graph = fakeGraph(undefined, 200, pages);
   const findings = await checkPolicyPage(page, graph.fetch);
   return { findings, graph };
@@ -32,6 +32,15 @@ describe('checkPolicyPage', () => {
     expect(statuses(findings)).toEqual([['url.privacy-policy', 'blocking']]);
     expect(findings[0]?.detail).toContain('does not use HTTPS');
     expect(graph.pageUrls).toHaveLength(0);
+  });
+
+  test('links blocking findings to the page docs, when set', async () => {
+    const docs = 'https://example.com/docs.md';
+    const url = 'http://example.com/privacy';
+    const linked = await check({}, { ...privacy, url, docs });
+    expect(linked.findings[0]?.docs).toBe(docs);
+    const plain = await check({}, { ...privacy, url });
+    expect(plain.findings[0]?.docs).toBeUndefined();
   });
 
   test('blocks a URL that does not parse', async () => {

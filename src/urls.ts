@@ -10,6 +10,8 @@ export interface PolicyPage {
   url: string;
   /** Also check that the page explains how to request data deletion. */
   deletion?: boolean;
+  /** A rejection page to link from blocking findings. */
+  docs?: string;
 }
 
 const MAX_REDIRECTS = 5;
@@ -74,6 +76,7 @@ export async function checkPolicyPage(
       status: 'blocking',
       title: `${page.name} URL is not publicly reachable`,
       detail: `${detail} Meta needs it on a live, public HTTPS page that anyone can open without signing in. See ${TERMS}`,
+      ...(page.docs && { docs: page.docs }),
     },
   ];
 
