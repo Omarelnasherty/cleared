@@ -13,7 +13,7 @@
 5. **The policy is in the HTML.** If the page is rendered only by JavaScript, the crawler may see an empty shell. Serve the policy text in the page itself, or as a static page.
 6. **The page is yours and says what it is.** Host it on your own domain, not on a Facebook page. Title it as a privacy policy for your app or company, not someone else's policy or a generic template page.
 
-Then run `cleared doctor`. It reads the URL from your app settings, loads it the way a crawler would and links to this page when the URL is missing or doesn't load.
+Then run `cleared doctor`. It reads the URL from your app settings and links to this page when the URL is missing. When the URL is set but doesn't load, it links to [We've noticed your app is missing a privacy policy URL or has a privacy policy URL that is returning an error](weve-noticed-your-app-is-missing-a-privacy-policy-url.md), the notice live apps get for the same problem.
 
 The text of the policy is your responsibility. The page only has to be reachable for this message to go away; App Review then reads what it says.
 

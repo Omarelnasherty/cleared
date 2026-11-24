@@ -10,6 +10,7 @@
 - `cleared doctor` ends every report with the checks the Graph API can't answer: one successful API call per permission in the 30 days before you submit, business verification, and when to switch to Live mode.
 - Add rejection pages for the two webhook verification messages, `The URL couldn't be validated. Callback verification failed with the following errors` and `The URL couldn't be validated. Response does not match challenge`. Doctor findings that match a rejection page link to it, in the text report and as `docs` in the JSON.
 - Add a rejection page for `Invalid Privacy Policy URL`, the message shown when an app can't switch to Live mode. The doctor links to it when the privacy policy URL is missing or doesn't load.
+- Add a rejection page for `We've noticed your app is missing a privacy policy URL or has a privacy policy URL that is returning an error`, the notice about a privacy policy link that stops working. The doctor now links to it when the privacy policy URL is set but doesn't load, and to `Invalid Privacy Policy URL` when it is missing.
 
 ## 0.1.0 (2026-11-15)
 

@@ -203,7 +203,7 @@ async function checkGraph(appId: string, appSecret: string, fetchImpl?: Fetch): 
         name: 'Privacy policy',
         url: app.privacy_policy_url,
         deletion: true,
-        docs: rejectionPageUrl('invalidPrivacyPolicy'),
+        docs: rejectionPageUrl('privacyPolicyError'),
       });
     }
     if (present(app.terms_of_service_url)) {

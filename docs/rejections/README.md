@@ -17,9 +17,10 @@ Meta doesn't report failed deauthorize calls: it sends the request once and does
 
 ## App settings and policy URLs
 
-| Message                                                     | Where you see it                                        |
-| ----------------------------------------------------------- | ------------------------------------------------------- |
-| [Invalid Privacy Policy URL](invalid-privacy-policy-url.md) | The App Dashboard, when you switch the app to Live mode |
+| Message                                                                                                                                                                   | Where you see it                                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Invalid Privacy Policy URL](invalid-privacy-policy-url.md)                                                                                                               | The App Dashboard, when you switch the app to Live mode                |
+| [We've noticed your app is missing a privacy policy URL or has a privacy policy URL that is returning an error](weve-noticed-your-app-is-missing-a-privacy-policy-url.md) | An email or developer notification about an app that is already set up |
 
 ## Webhooks
 

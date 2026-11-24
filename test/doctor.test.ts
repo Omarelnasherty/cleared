@@ -44,7 +44,7 @@ describe('runDoctor', () => {
     expect(statuses['url.privacy-policy']).toBe('blocking');
     expect(statuses['url.terms']).toBe('pass');
     const docs = Object.fromEntries(report.findings.map((f) => [f.id, f.docs]));
-    expect(docs['url.privacy-policy']).toBe(rejectionPageUrl('invalidPrivacyPolicy'));
+    expect(docs['url.privacy-policy']).toBe(rejectionPageUrl('privacyPolicyError'));
     expect(docs['url.terms']).toBeUndefined();
   });
 
