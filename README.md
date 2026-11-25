@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.1.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.2.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 

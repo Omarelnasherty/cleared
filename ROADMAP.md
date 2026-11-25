@@ -26,7 +26,7 @@ One small step at a time. Checked items are done.
 - [x] Rejection pages for webhooks, same format, and link each doctor finding that matches a page to it
 - [x] Rejection pages for app settings and policy URLs, same format, linked from the doctor findings: `Invalid Privacy Policy URL`
 - [x] More app settings rejection pages: the notice about a privacy policy URL that is missing or returns an error, linked from the doctor when the URL doesn't load. The app icon and category messages couldn't be confirmed and moved to Later
-- [ ] Prepare 0.2.0
+- [x] Prepare 0.2.0
 
 ## 0.3 Playbooks
 
