@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `cleared playbook <permission>`, which prints what the reviewer needs to see, the screencast steps and a reviewer notes template for a permission, as text or JSON. `cleared playbook` lists the playbooks. The first one is `pages_show_list`.
+
 ## 0.2.0 (2026-11-25)
 
 - Add the `cleared doctor` command. It checks that `META_APP_ID` and `META_APP_SECRET` are set, prints a text or JSON report and exits with 1 on blocking issues.

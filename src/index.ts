@@ -16,6 +16,13 @@ export {
   type StatusStore,
 } from './deletion.js';
 export {
+  formatPlaybook,
+  getPlaybook,
+  listPlaybooks,
+  type Playbook,
+  SCREENCAST_START,
+} from './playbooks.js';
+export {
   type ParseSignedRequestOptions,
   parseSignedRequest,
   SignedRequestError,

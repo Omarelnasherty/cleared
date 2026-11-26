@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util';
 import { formatReport, runDoctor } from './doctor.js';
 import { version } from './index.js';
+import { formatPlaybook, getPlaybook, listPlaybooks } from './playbooks.js';
 
 export interface CliIo {
   env: Record<string, string | undefined>;
@@ -15,10 +16,11 @@ export interface CliIo {
 const USAGE = `Usage: cleared <command> [options]
 
 Commands:
-  doctor    Check your app before you submit it for Meta App Review
+  doctor                 Check your app before you submit it for Meta App Review
+  playbook [permission]  Show what to prepare for a permission, or list them all
 
 Options:
-  --json                Print the report as JSON
+  --json                Print the report or playbook as JSON
   --deletion-url <url>  Send a signed test request to your data deletion callback
   -h, --help            Show this help
   -v, --version         Show the version
@@ -53,6 +55,9 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
     io.stdout(USAGE);
     return 0;
   }
+  if (command === 'playbook' && rest.length <= 1) {
+    return playbook(rest[0], values.json === true, io);
+  }
   if (command !== 'doctor' || rest.length > 0) {
     io.stderr(`Unknown command: ${positionals.join(' ')}\n\n${USAGE}`);
     return 2;
@@ -69,6 +74,28 @@ export async function main(argv: string[], io: CliIo): Promise<number> {
       : formatReport(report, { color: useColor(io) }),
   );
   return report.summary.blocking > 0 ? 1 : 0;
+}
+
+function playbook(permission: string | undefined, json: boolean, io: CliIo): number {
+  if (permission === undefined) {
+    const playbooks = listPlaybooks();
+    io.stdout(
+      json
+        ? `${JSON.stringify(playbooks, null, 2)}\n`
+        : `Playbooks:\n${playbooks.map((p) => `  ${p.permission.padEnd(32)} ${p.product}`).join('\n')}\n\nRun: cleared playbook <permission>\n`,
+    );
+    return 0;
+  }
+  const found = getPlaybook(permission);
+  if (!found) {
+    const names = listPlaybooks().map((p) => p.permission);
+    io.stderr(`No playbook for ${permission} yet. Available: ${names.join(', ')}\n`);
+    return 2;
+  }
+  io.stdout(
+    json ? `${JSON.stringify(found, null, 2)}\n` : formatPlaybook(found, { color: useColor(io) }),
+  );
+  return 0;
 }
 
 function parse(argv: string[]) {

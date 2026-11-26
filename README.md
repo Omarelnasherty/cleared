@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.2.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.2.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. `cleared playbook` has the first permission playbook, `pages_show_list`. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -207,6 +207,14 @@ Some requirements can't be read through the API, so every report also lists them
 It prints a report with a green check for what passed, an amber `!` for what you need to check by hand and a red cross for what blocks your submission. It exits with 1 when something is blocking, so you can run it in CI. Add `--json` for a machine-readable report.
 
 The secret is only read from the environment. The doctor sends it only to graph.facebook.com and never prints it or writes it anywhere. The test request to your callback carries a signature made with the secret, never the secret itself.
+
+## Playbooks
+
+```
+npx cleared playbook pages_show_list
+```
+
+A playbook tells you what the reviewer needs to see for one permission, the screencast step by step, and a reviewer notes template with `<placeholders>` to fill in. Every screencast starts the same way: logged out, then the full login. Run `npx cleared playbook` to list the permissions covered so far, and add `--json` for machine-readable output.
 
 ## Callbacks guide
 
