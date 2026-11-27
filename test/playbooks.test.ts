@@ -35,6 +35,23 @@ describe('playbooks', () => {
     }
   });
 
+  test('has the Messenger playbooks with their dependencies', () => {
+    expect(getPlaybook('pages_messaging')?.requires).toEqual([
+      'pages_manage_metadata',
+      'pages_show_list',
+    ]);
+    expect(getPlaybook('pages_manage_metadata')?.requires).toEqual(['pages_show_list']);
+    expect(getPlaybook('pages_read_engagement')?.requires).toEqual(['pages_show_list']);
+  });
+
+  test('every playbook prints without promising approval', () => {
+    for (const playbook of listPlaybooks()) {
+      const text = formatPlaybook(playbook);
+      expect(text).not.toMatch(/guarantee|\u2014/i);
+      if (playbook.requires.length > 0) expect(text).toContain('Request it with: ');
+    }
+  });
+
   test('lists playbooks sorted by permission', () => {
     const names = listPlaybooks().map((p) => p.permission);
     expect(names).toEqual([...names].sort());

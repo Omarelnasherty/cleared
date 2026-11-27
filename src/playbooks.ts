@@ -19,6 +19,10 @@ export interface Playbook {
 }
 
 const PERMISSIONS_REFERENCE = 'https://developers.facebook.com/docs/permissions';
+const reference = (permission: string) =>
+  `https://developers.facebook.com/docs/permissions/reference/${permission}/`;
+const SEND_API = 'https://developers.facebook.com/docs/messenger-platform/reference/send-api';
+const PAGE_WEBHOOKS = 'https://developers.facebook.com/docs/graph-api/webhooks/reference/page';
 const SCREEN_RECORDINGS =
   'https://developers.facebook.com/docs/app-review/submission-guide/screen-recordings';
 
@@ -54,6 +58,91 @@ Steps to test:
 
 <If requested for another permission:> We request pages_show_list as a dependency of <main permission>.`,
     docs: [PERMISSIONS_REFERENCE, SCREEN_RECORDINGS],
+  },
+  {
+    permission: 'pages_messaging',
+    product: 'Messenger',
+    summary: 'Lets your app read and send messages in the Messenger conversations of a Page.',
+    requires: ['pages_manage_metadata', 'pages_show_list'],
+    reviewerNeeds: [
+      'A message sent to the Page from a personal Messenger account showing up in your app.',
+      'A reply sent from your app (by a person or by your bot) arriving in that same Messenger conversation.',
+      'Both sides of the conversation: your app and the Messenger window, so the reviewer sees the message go through.',
+      "Replies sent within 24 hours of the person's last message. Messages outside that window need a message tag, and features like Human Agent are reviewed on their own.",
+    ],
+    screencast: [
+      'In the Facebook Login dialog, pick the Page that will receive messages.',
+      'Connect that Page in your app and show that it is now listening for messages.',
+      'From a second, personal account, open the Page in Messenger and send a message.',
+      'Show the message arriving in your app.',
+      'Reply from your app and show the reply in the Messenger window of the second account.',
+    ],
+    notes: `We use pages_messaging so that <who: Page admins, support agents, our bot> can read and answer messages sent to their Facebook Page from <app name>.
+
+Steps to test:
+1. Open <app URL> and log in with Facebook Login. <Test account, if needed: email and password.>
+2. Select the Page <test Page name> and connect it on <screen name>.
+3. From any personal account, send a message to <test Page name> in Messenger.
+4. The message appears in <screen name> in our app. <Bot apps: say what the bot answers.>
+5. Reply from our app. The reply appears in the Messenger conversation.
+
+We only reply within 24 hours of the person's last message. <If you use a message tag, name it and say when.>`,
+    docs: [reference('pages_messaging'), SEND_API, SCREEN_RECORDINGS],
+  },
+  {
+    permission: 'pages_manage_metadata',
+    product: 'Pages',
+    summary:
+      'Lets your app subscribe a Page to webhooks and update its settings, for example to receive its messages.',
+    requires: ['pages_show_list'],
+    reviewerNeeds: [
+      'The moment your app subscribes the Page, usually when a person connects it, so the reviewer sees why the app needs Page webhooks.',
+      'An event from the Page reaching your app soon after, such as a new message or comment, to prove the subscription is used.',
+      'If you request it for pages_messaging, the use case description naming pages_messaging as the main permission.',
+    ],
+    screencast: [
+      'In the Facebook Login dialog, pick the Page to connect.',
+      'Connect the Page in your app. Show the screen that confirms it is connected (your app calls POST /{page-id}/subscribed_apps here).',
+      'Trigger an event on the Page, for example a message or a comment from a second account.',
+      'Show the event arriving in your app.',
+    ],
+    notes: `We use pages_manage_metadata to subscribe the Pages people connect to <app name> to webhooks, so we receive <which events: messages, comments, feed updates> for those Pages.
+
+Steps to test:
+1. Open <app URL> and log in with Facebook Login. <Test account, if needed: email and password.>
+2. Select the Page <test Page name> and connect it on <screen name>. This subscribes the Page to our webhooks.
+3. <Send a message to the Page / comment on a Page post> from any personal account.
+4. The event appears in <screen name> in our app.
+
+<If requested for another permission:> We request pages_manage_metadata as a dependency of <main permission>.`,
+    docs: [reference('pages_manage_metadata'), PAGE_WEBHOOKS, SCREEN_RECORDINGS],
+  },
+  {
+    permission: 'pages_read_engagement',
+    product: 'Pages',
+    summary:
+      'Lets your app read what a Page posts, such as posts, photos, videos and events, along with its followers and engagement data.',
+    requires: ['pages_show_list'],
+    reviewerNeeds: [
+      'Content of the connected Page, read through the API, shown inside your app.',
+      'A clear link between that data and a feature of your app, for example a list of posts to reply to or a report.',
+      'Only data from Pages the person manages and connected to your app.',
+    ],
+    screencast: [
+      'In the Facebook Login dialog, pick the Page to connect.',
+      'Connect the Page in your app.',
+      'Open the screen that shows the Page data, for example its posts and their comments (read from GET /{page-id}/feed).',
+      'Show what the person does with that data in your app.',
+    ],
+    notes: `We use pages_read_engagement to show <what: Page posts, comments, follower or engagement data> for the Pages people connect to <app name>, so they can <what they do with it>.
+
+Steps to test:
+1. Open <app URL> and log in with Facebook Login. <Test account, if needed: email and password.>
+2. Select the Page <test Page name> and connect it on <screen name>.
+3. Open <screen name>. You will see <what the screen shows> for that Page.
+
+<If requested for another permission:> We request pages_read_engagement as a dependency of <main permission>.`,
+    docs: [reference('pages_read_engagement'), SCREEN_RECORDINGS],
   },
 ];
 

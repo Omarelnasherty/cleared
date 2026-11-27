@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add `cleared playbook <permission>`, which prints what the reviewer needs to see, the screencast steps and a reviewer notes template for a permission, as text or JSON. `cleared playbook` lists the playbooks. The first one is `pages_show_list`.
+- Add the Messenger playbooks: `pages_messaging`, `pages_manage_metadata` and `pages_read_engagement`.
 
 ## 0.2.0 (2026-11-25)
 

@@ -31,7 +31,7 @@ One small step at a time. Checked items are done.
 ## 0.3 Playbooks
 
 - [x] Playbook format and `cleared playbook <permission>`: what the reviewer needs to see, screencast steps, reviewer notes template, with `pages_show_list` as the first playbook
-- [ ] Messenger: `pages_messaging`, `pages_manage_metadata`, `pages_read_engagement`
+- [x] Messenger: `pages_messaging`, `pages_manage_metadata`, `pages_read_engagement`
 - [ ] Instagram: `instagram_business_basic`, `instagram_business_manage_messages`
 - [ ] WhatsApp: `whatsapp_business_messaging`, `whatsapp_business_management`, `business_management`
 - [ ] Login: `email`, `public_profile`

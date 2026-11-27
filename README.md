@@ -13,7 +13,7 @@ cleared does that work for you:
 - **Doctor.** `npx cleared doctor` reads your app settings through the Graph API, tests your URLs, webhooks and callbacks, and tells you what will get you rejected before you submit.
 - **Playbooks.** For each common permission: what the reviewer needs to see, the screencast steps, and a template for the reviewer notes.
 
-> **Status:** 0.2.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. `cleared playbook` has the first permission playbook, `pages_show_list`. Follow the [roadmap](ROADMAP.md) for the rest.
+> **Status:** 0.2.0, early development. The callbacks are ready: signed request parsing, the data deletion and deauthorize handlers, the status page and the Express and Next.js adapters, with an [example app](examples/express), a [callbacks guide](docs/callbacks.md) and the first [rejection pages](docs/rejections/README.md). `cleared doctor` checks the environment, the app settings it can read through the Graph API, your policy pages, your webhook subscriptions and, with `--deletion-url`, your data deletion callback, and lists what you need to check by hand. `cleared playbook` covers the Pages and Messenger permissions: `pages_show_list`, `pages_messaging`, `pages_manage_metadata` and `pages_read_engagement`. Follow the [roadmap](ROADMAP.md) for the rest.
 
 ## Install
 
@@ -211,10 +211,10 @@ The secret is only read from the environment. The doctor sends it only to graph.
 ## Playbooks
 
 ```
-npx cleared playbook pages_show_list
+npx cleared playbook pages_messaging
 ```
 
-A playbook tells you what the reviewer needs to see for one permission, the screencast step by step, and a reviewer notes template with `<placeholders>` to fill in. Every screencast starts the same way: logged out, then the full login. Run `npx cleared playbook` to list the permissions covered so far, and add `--json` for machine-readable output.
+A playbook tells you what the reviewer needs to see for one permission, the screencast step by step, and a reviewer notes template with `<placeholders>` to fill in. Every screencast starts the same way: logged out, then the full login. A playbook also names the permissions to request with it: `pages_messaging` needs `pages_manage_metadata` and `pages_show_list`. Run `npx cleared playbook` to list the permissions covered so far, and add `--json` for machine-readable output.
 
 ## Callbacks guide
 
