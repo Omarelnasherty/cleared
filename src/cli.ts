@@ -82,7 +82,7 @@ function playbook(permission: string | undefined, json: boolean, io: CliIo): num
     io.stdout(
       json
         ? `${JSON.stringify(playbooks, null, 2)}\n`
-        : `Playbooks:\n${playbooks.map((p) => `  ${p.permission.padEnd(32)} ${p.product}`).join('\n')}\n\nRun: cleared playbook <permission>\n`,
+        : `Playbooks:\n${playbooks.map((p) => `  ${p.permission.padEnd(36)} ${p.product}`).join('\n')}\n\nRun: cleared playbook <permission>\n`,
     );
     return 0;
   }

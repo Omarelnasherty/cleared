@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { type CliIo, main } from '../src/cli.js';
-import { formatPlaybook, getPlaybook, listPlaybooks } from '../src/playbooks.js';
+import { formatPlaybook, getPlaybook, listPlaybooks, type Playbook } from '../src/playbooks.js';
 
 async function run(argv: string[], isTTY = false) {
   let stdout = '';
@@ -42,6 +42,19 @@ describe('playbooks', () => {
     ]);
     expect(getPlaybook('pages_manage_metadata')?.requires).toEqual(['pages_show_list']);
     expect(getPlaybook('pages_read_engagement')?.requires).toEqual(['pages_show_list']);
+  });
+
+  test('has the Instagram playbooks with Business Login for Instagram', () => {
+    const basic = getPlaybook('instagram_business_basic');
+    const messages = getPlaybook('instagram_business_manage_messages');
+    expect(basic?.requires).toEqual([]);
+    expect(messages?.requires).toEqual(['instagram_business_basic']);
+    for (const playbook of [basic, messages]) {
+      expect(playbook?.login).toBe('Business Login for Instagram');
+      const text = formatPlaybook(playbook as Playbook);
+      expect(text).toContain('log in with Business Login for Instagram');
+      expect(text).not.toContain('Facebook Login');
+    }
   });
 
   test('every playbook prints without promising approval', () => {

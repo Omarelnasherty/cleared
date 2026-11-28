@@ -4,6 +4,7 @@
 
 - Add `cleared playbook <permission>`, which prints what the reviewer needs to see, the screencast steps and a reviewer notes template for a permission, as text or JSON. `cleared playbook` lists the playbooks. The first one is `pages_show_list`.
 - Add the Messenger playbooks: `pages_messaging`, `pages_manage_metadata` and `pages_read_engagement`.
+- Add the Instagram playbooks: `instagram_business_basic` and `instagram_business_manage_messages`. Each playbook now names its login, and the Instagram ones use Business Login for Instagram.
 
 ## 0.2.0 (2026-11-25)
 

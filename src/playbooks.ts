@@ -1,3 +1,6 @@
+/** The login products a playbook can use. */
+export type Login = 'Facebook Login' | 'Business Login for Instagram';
+
 /** What to prepare for one permission before you submit it for App Review. */
 export interface Playbook {
   /** The permission name, as it appears in App Review. */
@@ -6,6 +9,8 @@ export interface Playbook {
   product: string;
   /** What the permission gives your app, in one sentence. */
   summary: string;
+  /** The login the screencast and the reviewer go through. */
+  login: Login;
   /** Other permissions to request with it. */
   requires: string[];
   /** What the reviewer has to see in your app and your submission. */
@@ -26,18 +31,89 @@ const PAGE_WEBHOOKS = 'https://developers.facebook.com/docs/graph-api/webhooks/r
 const SCREEN_RECORDINGS =
   'https://developers.facebook.com/docs/app-review/submission-guide/screen-recordings';
 
+const INSTAGRAM_APP_REVIEW = 'https://developers.facebook.com/docs/instagram-platform/app-review';
+const INSTAGRAM_LOGIN =
+  'https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login';
+const INSTAGRAM_MESSAGING =
+  'https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/messaging-api';
+const INSTAGRAM_WEBHOOKS = 'https://developers.facebook.com/docs/instagram-platform/webhooks';
+
 /** Steps that open every screencast, whatever the permission. */
-export const SCREENCAST_START = [
-  'Start logged out, in a clean browser window.',
-  'Show the full login: open your app, log in with Facebook Login and show the permission dialog.',
-  'If people can also sign up without Facebook Login, show that path too and add a test account to the notes.',
-];
+export function screencastStart(login: Login): string[] {
+  return [
+    'Start logged out, in a clean browser window.',
+    `Show the full login: open your app, log in with ${login} and show the permission dialog.`,
+    `If people can also sign up without ${login}, show that path too and add a test account to the notes.`,
+  ];
+}
 
 const PLAYBOOKS: readonly Playbook[] = [
+  {
+    permission: 'instagram_business_basic',
+    product: 'Instagram',
+    summary:
+      'Lets your app read the profile and media of an Instagram professional account that logs in to your app.',
+    login: 'Business Login for Instagram',
+    requires: [],
+    reviewerNeeds: [
+      'A person connecting their Instagram professional account (Business or Creator) to your app with Business Login for Instagram.',
+      'Data read through the API shown in your app right after, such as the username and account ID, so the reviewer sees the connection worked.',
+      'Only basic account data used for that purpose. If you read media too, show the screen where your app uses it.',
+    ],
+    screencast: [
+      'Record with an Instagram professional account, not a personal one, and approve the permissions on the Instagram consent screen.',
+      'Back in your app, show the connected account with its username (read from GET /me on graph.instagram.com).',
+      'Show what your app does next with that account, for example its settings screen.',
+    ],
+    notes: `We use instagram_business_basic to identify the Instagram professional account people connect to <app name> and to show its <username, profile picture, media> in <screen name>.
+
+Steps to test:
+1. Open <app URL> and log in. <Test account, if needed: email and password.>
+2. Click <button name> and log in with an Instagram professional account. <Test Instagram account, if needed.>
+3. Approve the permissions on the Instagram consent screen.
+4. On <screen name>, you will see the connected account and its username.
+
+<If requested for another permission:> We request instagram_business_basic as a dependency of <main permission>.`,
+    docs: [PERMISSIONS_REFERENCE, INSTAGRAM_LOGIN, INSTAGRAM_APP_REVIEW],
+  },
+  {
+    permission: 'instagram_business_manage_messages',
+    product: 'Instagram',
+    summary:
+      'Lets your app read and answer the direct messages of an Instagram professional account that logs in to your app.',
+    login: 'Business Login for Instagram',
+    requires: ['instagram_business_basic'],
+    reviewerNeeds: [
+      'A direct message sent to the connected professional account from a second Instagram account showing up in your app.',
+      'A reply sent from your app (by a person or by your bot) arriving in that same Instagram conversation.',
+      'Both sides of the conversation: your app and the Instagram app or website of the second account, so the reviewer sees the message go through.',
+      'Your app only messaging people who wrote first, and replying within 24 hours. The human agent tag, which allows a reply within 7 days, is reviewed on its own.',
+      'A way for the person to reach a human, if a bot answers first.',
+    ],
+    screencast: [
+      'Record with an Instagram professional account, not a personal one, and approve the messaging permission on the Instagram consent screen.',
+      'Show that the account is connected and your app is receiving its messages (your app calls POST /me/subscribed_apps with the messages field here).',
+      'From a second Instagram account, send a direct message to the connected account.',
+      'Show the message arriving in your app.',
+      'Reply from your app and show the reply in the conversation on the second account.',
+    ],
+    notes: `We use instagram_business_manage_messages so that <who: business owners, support agents, our bot> can read and answer the Instagram direct messages of their professional account from <app name>.
+
+Steps to test:
+1. Open <app URL> and log in. <Test account, if needed: email and password.>
+2. Click <button name> and log in with the Instagram professional account <test account username>.
+3. From any other Instagram account, send a direct message to <test account username>.
+4. The message appears in <screen name> in our app. <Bot apps: say what the bot answers and how to reach a person.>
+5. Reply from our app. The reply appears in the Instagram conversation.
+
+We only reply to people who messaged the account first, within 24 hours of their last message. <If you use the human agent tag, say when.>`,
+    docs: [PERMISSIONS_REFERENCE, INSTAGRAM_MESSAGING, INSTAGRAM_WEBHOOKS, INSTAGRAM_APP_REVIEW],
+  },
   {
     permission: 'pages_show_list',
     product: 'Pages',
     summary: 'Lets your app read the list of Facebook Pages a person manages.',
+    login: 'Facebook Login',
     requires: [],
     reviewerNeeds: [
       'A person choosing which of their Pages to connect, in your app, from a list your app reads through the API.',
@@ -63,6 +139,7 @@ Steps to test:
     permission: 'pages_messaging',
     product: 'Messenger',
     summary: 'Lets your app read and send messages in the Messenger conversations of a Page.',
+    login: 'Facebook Login',
     requires: ['pages_manage_metadata', 'pages_show_list'],
     reviewerNeeds: [
       'A message sent to the Page from a personal Messenger account showing up in your app.',
@@ -94,6 +171,7 @@ We only reply within 24 hours of the person's last message. <If you use a messag
     product: 'Pages',
     summary:
       'Lets your app subscribe a Page to webhooks and update its settings, for example to receive its messages.',
+    login: 'Facebook Login',
     requires: ['pages_show_list'],
     reviewerNeeds: [
       'The moment your app subscribes the Page, usually when a person connects it, so the reviewer sees why the app needs Page webhooks.',
@@ -122,6 +200,7 @@ Steps to test:
     product: 'Pages',
     summary:
       'Lets your app read what a Page posts, such as posts, photos, videos and events, along with its followers and engagement data.',
+    login: 'Facebook Login',
     requires: ['pages_show_list'],
     reviewerNeeds: [
       'Content of the connected Page, read through the API, shown inside your app.',
@@ -172,8 +251,9 @@ export function formatPlaybook(playbook: Playbook, options: { color?: boolean } 
   lines.push(heading('What the reviewer needs to see'));
   lines.push(...playbook.reviewerNeeds.map((item) => `  - ${item}`), '');
   lines.push(heading('Screencast'));
-  lines.push(...numbered(SCREENCAST_START));
-  lines.push(...numbered(playbook.screencast, SCREENCAST_START.length + 1), '');
+  const start = screencastStart(playbook.login);
+  lines.push(...numbered(start));
+  lines.push(...numbered(playbook.screencast, start.length + 1), '');
   lines.push(heading('Reviewer notes'));
   lines.push(...playbook.notes.split('\n').map((line) => (line ? `  ${line}` : '')), '');
   lines.push(heading('Docs'));
